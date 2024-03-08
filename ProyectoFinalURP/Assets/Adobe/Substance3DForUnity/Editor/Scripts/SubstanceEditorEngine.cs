@@ -97,7 +97,8 @@ namespace Adobe.SubstanceEditor
         public bool IsInitialized => _isLoaded;
 
         /// <summary>
-        /// Initalize substance engine.
+        /// Prepares infrastructure for managing substance assets in the editor. 
+        /// Intializes the substance engine and starts listening for Editor events.
         /// </summary>
         private void Setup()
         {
@@ -111,9 +112,7 @@ namespace Adobe.SubstanceEditor
             EditorApplication.playModeStateChanged += PlaymodeStateChanged;
             Undo.undoRedoPerformed += UndoCallback;
         }
-
         
-
         private void UndoCallback()
         {
             if (Selection.activeObject is SubstanceGraphSO)
@@ -131,7 +130,7 @@ namespace Adobe.SubstanceEditor
         }
 
         /// <summary>
-        /// Shutdown substance engine.
+        /// Stops listening to Editor events and shuts down the substance engine.
         /// </summary>
         private void TearDown()
         {
@@ -174,7 +173,7 @@ namespace Adobe.SubstanceEditor
         {
             if (!_isLoaded)
             {
-                LoadAllSbsarFiles();
+                LoadAllRuntimeOnlySbsarFiles();
                 _isLoaded = true;
             }
 
@@ -555,35 +554,23 @@ namespace Adobe.SubstanceEditor
         }
 
         /// <summary>
-        /// Renders a substance file using the substance engine.
+        /// Renders a SubstanceGraphSO asynchronously.
         /// </summary>
-        /// <param name="assetPath">Path to a sbsar file.</param>
-        /// <param name="graphID">Target graph index.</param>
-        /// <returns>Task that will be finished once the rendering is finished.</returns>
+        /// <param name="instances">Target SubstanceGraphSO to render.</param>
         public void RenderInstanceAsync(SubstanceGraphSO instances)
         {
             if (TryGetHandlerFromInstance(instances, out SubstanceNativeGraph substanceArchive))
                 SubmitAsyncRenderWork(substanceArchive, instances);
         }
 
+        /// <summary>
+        /// Renders multiple SubstanceGraphSO asynchronously.
+        /// </summary>
+        /// <param name="instances">List of target SubstanceGraphSO objects to render.</param>
         public void RenderInstanceAsync(IReadOnlyList<SubstanceGraphSO> instances)
         {
             foreach (var graph in instances)
                 RenderInstanceAsync(graph);
-        }
-
-        /// <summary>
-        /// Assigns the substance graph objects inputs to the substance file Handlers associated with them.
-        /// </summary>
-        /// <param name="assetPath">Path to the sbsar object.</param>
-        /// <param name="graphCopy">List of graph objects.</param>
-        internal void SetSubstanceInput(SubstanceGraphSO instance)
-        {
-            if (TryGetHandlerFromInstance(instance, out SubstanceNativeGraph substanceArchive))
-            {
-                foreach (var input in instance.Input)
-                    input.UpdateNativeHandle(substanceArchive);
-            }
         }
 
         #region Preset
@@ -666,10 +653,40 @@ namespace Adobe.SubstanceEditor
             return true;
         }
 
+        public void UpdateGraphsToNewFile(string assetPath, byte[] fileContent)
+        {
+            var updatedGraphs = new List<SubstanceGraphSO>();
+
+            foreach (var graph in _managedInstances)
+            {
+                if (graph.AssetPath == assetPath)
+                {
+                    if(TryGetHandlerFromInstance(graph, out SubstanceNativeGraph nativeGraph))
+                    {
+                        var currentState = nativeGraph.CreatePresetFromCurrentState();
+                        nativeGraph.Dispose();
+                        _activeSubstanceDictionary[graph.GUID] = Engine.OpenFile(fileContent, graph.GetNativeID());
+                        _activeSubstanceDictionary[graph.GUID].ApplyPreset(currentState);
+
+                        graph.Input = GetGraphInputs(_activeSubstanceDictionary[graph.GUID]);
+                        graph.Output = GetGraphOutputs(_activeSubstanceDictionary[graph.GUID]);
+
+                        RenderingUtils.ConfigureOutputTextures(_activeSubstanceDictionary[graph.GUID], graph);
+
+                        EditorUtility.SetDirty(graph);
+
+                        updatedGraphs.Add(graph);
+                    }
+                }
+            }
+
+            SubmitAsyncRenderWorkBatch(updatedGraphs);
+        }
+
         /// <summary>
-        /// Loads all sbsar files currently in the project.
+        /// Loads all sbsar files currently in the project marked as "Runtime only".
         /// </summary>
-        private void LoadAllSbsarFiles()
+        private void LoadAllRuntimeOnlySbsarFiles()
         {
             string[] files = Directory.GetFiles(Application.dataPath, "*.sbsar", SearchOption.AllDirectories);
 

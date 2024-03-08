@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
+using UnityEditor.Graphs;
 using UnityEngine;
 
 namespace Adobe.SubstanceEditor
@@ -251,6 +252,28 @@ namespace Adobe.SubstanceEditor
                 graph.RuntimeInitialize(_nativeGraph, graph.IsRuntimeOnly);
 
             return _nativeGraph.CreatePresetFromCurrentState();
+        }
+
+        /// <summary>
+        /// Load preset JSON into the current state of the target SubstanceGraphSO.
+        /// </summary>
+        /// <param name="graph">Target SubstanceGraphSO. </param>
+        /// <param name="presetJSON">Preset text.</param>
+        public static void LoadPresetToCurrentState(SubstanceGraphSO graph, string presetJSON)
+        {
+            if (!SubstanceEditorEngine.instance.TryGetHandlerFromInstance(graph, out SubstanceNativeGraph _nativeGraph))
+            {
+                if (!SubstanceEditorEngine.instance.IsInitialized)
+                    return;
+
+                SubstanceEditorEngine.instance.InitializeInstance(graph, null, out SubstanceGraphSO _);
+            }
+
+            if (SubstanceEditorEngine.instance.TryGetHandlerFromInstance(graph, out _nativeGraph))
+                graph.RuntimeInitialize(_nativeGraph, graph.IsRuntimeOnly);
+
+            SubstanceEditorEngine.instance.LoadPresetsToGraph(graph, presetJSON);
+            SubstanceEditorEngine.instance.SubmitAsyncRenderWork(_nativeGraph, graph);
         }
 
         /// <summary>

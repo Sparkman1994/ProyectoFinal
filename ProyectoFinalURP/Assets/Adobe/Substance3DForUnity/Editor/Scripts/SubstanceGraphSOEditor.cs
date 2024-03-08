@@ -29,7 +29,6 @@ namespace Adobe.SubstanceEditor
 
         private SubstanceNativeGraph _nativeGraph = null;
 
-        // Scrollview handling:
         private Rect lastRect;
 
         private Texture2D _backgroundImage;
@@ -50,8 +49,6 @@ namespace Adobe.SubstanceEditor
 
         private IReadOnlyList<SerializedProperty> _outputProperties;
         private SerializedProperty _presetsListProperty;
-
-        
 
         public void OnEnable()
         {
@@ -137,6 +134,7 @@ namespace Adobe.SubstanceEditor
             {
                 SaveTGAFiles();
                 UpdateGraphMaterialLabel();
+
                 AssetDatabase.Refresh();
             }
 
@@ -156,6 +154,12 @@ namespace Adobe.SubstanceEditor
                 {
                     return;
                 }
+
+                if (_nativeGraph.IsDisposed())
+                {
+                    _nativeGraph = null;
+                    return;
+                }
             }
 
             if (_materialPreviewEditor == null)
@@ -168,15 +172,23 @@ namespace Adobe.SubstanceEditor
 
             serializedObject.Update();
 
-            if (FirstConfigurePresets() || DrawGraph())
+            try
             {
-                serializedObject.ApplyModifiedProperties();
-                _propertiesChanged = true;
+                if (FirstConfigurePresets() || DrawGraph())
+                {
+                    serializedObject.ApplyModifiedProperties();
+                    _propertiesChanged = true;
+                }
             }
+            catch (ObjectDisposedException)
+            {
+            }
+
+            
         }
 
         /// <summary>
-        /// Callback for GUI events to block substance files from been duplicated.
+        /// Callback for GUI events to block substance files from been duplicated
         /// </summary>
         /// <param name="guid">Asset guid.</param>
         /// <param name="rt">GUI rect.</param>
@@ -793,6 +805,7 @@ namespace Adobe.SubstanceEditor
                             if (GUILayout.Button(_ApplyPresetGUIContent))
                             {
                                 HandleApplyPreset(graph);
+                                result = true;
                             }
 
                             //Disable Update and Delete for native presets.
@@ -1421,6 +1434,9 @@ namespace Adobe.SubstanceEditor
                 return false;
 
             var bakedPresets = _nativeGraph.GetPresetsList();
+
+            if (bakedPresets.Count == 0)
+                return false;
 
             for (int i = 0; i < bakedPresets.Count; i++)
             {

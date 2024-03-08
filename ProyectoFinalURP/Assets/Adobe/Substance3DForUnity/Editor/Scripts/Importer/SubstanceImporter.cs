@@ -159,7 +159,11 @@ namespace Adobe.SubstanceEditor.Importer
 
             _fileAsset = ScriptableObject.CreateInstance<SubstanceFileSO>();
 
-            if (!CheckIfFileIsReimportedByUnity(ctx))
+            if (CheckIfFileIsReimportedByUnity(ctx))
+            {
+                SubstanceEditorEngine.instance.UpdateGraphsToNewFile(ctx.assetPath, rawData.FileContent);
+            }
+            else
             {
                 CreateSubstanceFile(ctx, rawData);
             }
@@ -194,7 +198,6 @@ namespace Adobe.SubstanceEditor.Importer
 
         private bool CheckIfFileIsReimportedByUnity(AssetImportContext ctx)
         {
-#if UNITY_EDITOR_OSX
             string[] guids = AssetDatabase.FindAssets(string.Format("t:{0}", typeof(SubstanceGraphSO)));
 
             for (int i = 0; i < guids.Length; i++)
@@ -210,7 +213,7 @@ namespace Adobe.SubstanceEditor.Importer
                     }
                 }
             }
-#endif
+
             return false;
         }
     }

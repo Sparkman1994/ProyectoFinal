@@ -41,6 +41,10 @@ namespace Adobe.SubstanceEditor
                         changed = DrawComboBox(valueProperty, content as SubstanceIntGUIContent, out value);
                         break;
 
+                    case SubstanceWidgetType.EnumButton:
+                        changed = DrawEnumButton(valueProperty, content as SubstanceIntGUIContent, out value);
+                        break;
+
                     default:
                         changed = DrawDefault(valueProperty, content, out value);
                         break;
@@ -109,6 +113,28 @@ namespace Adobe.SubstanceEditor
         private static bool DrawComboBox(SerializedProperty valueProperty, SubstanceIntGUIContent content, out int newValue)
         {
             var specializedContent = content as SubstanceIntComboBoxGUIContent;
+
+            var oldValue = valueProperty.intValue;
+            newValue = EditorGUILayout.IntPopup(content, oldValue, specializedContent.EnumValuesGUI, specializedContent.EnumValues);
+
+            if (oldValue != newValue)
+            {
+                valueProperty.intValue = newValue;
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Renders the int input an enum button.
+        /// </summary>
+        /// <param name="valueProperty">Value property.</param>
+        /// <param name="content">GUI content.</param>
+        /// <returns>True if value changed.</returns>
+        private static bool DrawEnumButton(SerializedProperty valueProperty, SubstanceIntGUIContent content, out int newValue)
+        {
+            var specializedContent = content as SubstanceIntEnumButtonGUIContent;
 
             var oldValue = valueProperty.intValue;
             newValue = EditorGUILayout.IntPopup(content, oldValue, specializedContent.EnumValuesGUI, specializedContent.EnumValues);

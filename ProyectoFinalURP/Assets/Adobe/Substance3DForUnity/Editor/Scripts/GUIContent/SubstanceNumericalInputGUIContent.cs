@@ -170,4 +170,26 @@ namespace Adobe.SubstanceEditor
             }
         }
     }
+
+    internal class SubstanceIntEnumButtonGUIContent : SubstanceIntGUIContent
+    {
+        public GUIContent[] EnumValuesGUI { get; }
+
+        public int[] EnumValues { get; }
+
+        public SubstanceIntEnumButtonGUIContent(SubstanceInputDescription description, SubstanceInputDescNumericalInt intDescription, SerializedProperty dataProp) : base(description, dataProp, intDescription)
+        {
+            var enumValues = intDescription.EnumValues;
+
+            EnumValuesGUI = new GUIContent[enumValues.Length];
+            EnumValues = new int[enumValues.Length];
+
+            for (int i = 0; i < EnumValuesGUI.Length; i++)
+            {
+                var enumElement = enumValues[i];
+                EnumValuesGUI[i] = new GUIContent(enumElement.Label);
+                EnumValues[i] = enumElement.Value;
+            }
+        }
+    }
 }

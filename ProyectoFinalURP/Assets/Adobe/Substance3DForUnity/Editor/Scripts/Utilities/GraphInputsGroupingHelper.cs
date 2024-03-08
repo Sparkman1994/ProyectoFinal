@@ -1,6 +1,8 @@
 using Adobe.Substance;
+using Adobe.Substance.Input;
 using Adobe.Substance.Input.Description;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using UnityEditor;
 
@@ -109,7 +111,7 @@ namespace Adobe.SubstanceEditor
                                 break;
 
                             case SubstanceValueType.Int:
-                                guiContent = (target.Description.WidgetType == SubstanceWidgetType.ComboBox) ? new SubstanceIntComboBoxGUIContent(target.Description, descNumerical as SubstanceInputDescNumericalInt, dataProp) : new SubstanceIntGUIContent(target.Description, dataProp, descNumerical as SubstanceInputDescNumericalInt);
+                                guiContent = GetGUIContentForInt(target, descNumerical, dataProp);
                                 break;
 
                             case SubstanceValueType.Int2:
@@ -148,8 +150,21 @@ namespace Adobe.SubstanceEditor
 
             InputGroups = GUIgroups;
         }
-    }
 
+        private static SubstanceInputGUIContent GetGUIContentForInt(ISubstanceInput target, ISubstanceInputDescNumerical descNumerical, SerializedProperty dataProp)
+        {
+            if (target.Description.WidgetType == SubstanceWidgetType.ComboBox)
+            {
+                return new SubstanceIntComboBoxGUIContent(target.Description, descNumerical as SubstanceInputDescNumericalInt, dataProp);
+            }
+            else if (target.Description.WidgetType == SubstanceWidgetType.EnumButton)
+            {
+                return new SubstanceIntEnumButtonGUIContent(target.Description, descNumerical as SubstanceInputDescNumericalInt, dataProp);
+            }
+   
+            return new SubstanceIntGUIContent(target.Description, dataProp, descNumerical as SubstanceInputDescNumericalInt);
+        }
+    }
     internal class GraphOutputAlphaChannelsHelper
     {
         private readonly List<string> _channels;
