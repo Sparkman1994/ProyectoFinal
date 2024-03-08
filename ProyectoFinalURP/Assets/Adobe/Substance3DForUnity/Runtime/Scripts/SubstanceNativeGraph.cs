@@ -77,6 +77,9 @@ namespace Adobe.Substance
         /// <returns>Native render result.</returns>
         public IntPtr Render()
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode errorCode = (ErrorCode)NativeMethods.sbsario_sbsar_render(_handler, (IntPtr)_fileGraphID, out IntPtr result);
 
             if (errorCode != ErrorCode.SBSARIO_ERROR_OK)
@@ -91,6 +94,9 @@ namespace Adobe.Substance
         /// <returns>Raw graph thumbnail RGBA data.</returns>
         public byte[] GetThumbnail()
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_get_graph_thumbnail(_handler, (IntPtr)_fileGraphID, out NativeThumbnail thumbnail);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -108,6 +114,9 @@ namespace Adobe.Substance
 
         public string CreatePresetFromCurrentState()
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             //Alocate 1Mb for the preset file text.
             NativePreset preset = new NativePreset
             {
@@ -137,6 +146,9 @@ namespace Adobe.Substance
         /// <param name="presetXML"></param>
         public void ApplyPreset(string presetXML)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             NativePreset preset = new NativePreset();
             preset.XMLString = Marshal.StringToHGlobalAnsi(presetXML);
 
@@ -156,6 +168,9 @@ namespace Adobe.Substance
 
         public void ApplyBakedPreset(int index)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_apply_baked_preset(_handler, (IntPtr)_fileGraphID, (IntPtr)index);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -164,6 +179,9 @@ namespace Adobe.Substance
 
         public List<SubstancePresetInfo> GetPresetsList()
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             List<SubstancePresetInfo> presets = new List<SubstancePresetInfo>();
 
             IntPtr count = IntPtr.Zero;
@@ -204,11 +222,17 @@ namespace Adobe.Substance
         /// <returns>Total graph output count.</returns>
         public int GetOutputCount()
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             return (int)NativeMethods.sbsario_sbsar_get_output_count(_handler, (IntPtr)_fileGraphID);
         }
 
         public SubstanceOutputDescription GetOutputDescription(int outputID)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_get_output_desc(_handler, (IntPtr)_fileGraphID, (IntPtr)outputID, out NativeOutputDesc inputDesc);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -248,6 +272,9 @@ namespace Adobe.Substance
 
         public SubstanceOutputDescription CreateVirtualOutput(SubstanceVirtualOutputCreateInfo info)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             var description = info.CreateOutputDesc();
             var format = info.CreateOutputFormat();
 
@@ -272,6 +299,9 @@ namespace Adobe.Substance
 
         public int CreateOutputCopy(int outputID)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_create_output_copy(_handler, (IntPtr)_fileGraphID, (IntPtr)outputID, out NativeOutputDesc inputDesc);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -282,6 +312,9 @@ namespace Adobe.Substance
 
         public uint GetOutputUID(int outputIndex)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_get_output_uid(_handler, (IntPtr)_fileGraphID, (IntPtr)outputIndex, out IntPtr outputUID);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -292,6 +325,9 @@ namespace Adobe.Substance
 
         public void AssignOutputToAlphaChannel(int targetOutputID, int alphaChannelID, bool invert = false)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             float minValue = invert ? 1f : 0f;
             float maxValue = invert ? 0f : 1f;
 
@@ -303,6 +339,9 @@ namespace Adobe.Substance
 
         public void ResetAlphaChannelAssignment(int targetOutputID)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_get_output_desc(_handler, (IntPtr)_fileGraphID, (IntPtr)targetOutputID, out NativeOutputDesc outputDesc);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -332,6 +371,9 @@ namespace Adobe.Substance
 
         public void ChangeOutputRBChannels(int targetOutputID)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_get_output_format_override(_handler, (IntPtr)_fileGraphID, (IntPtr)targetOutputID, out IntPtr isFormatOverridenPtr, out NativeOutputFormat oldFormat);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -375,6 +417,9 @@ namespace Adobe.Substance
         /// <returns>Total graph input count.</returns>
         public int GetInputCount()
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             return (int)NativeMethods.sbsario_sbsar_get_input_count(_handler, (IntPtr)_fileGraphID);
         }
 
@@ -385,6 +430,9 @@ namespace Adobe.Substance
         /// <returns>Substance input object.</returns>
         public SubstanceInputBase GetInputObject(int inputID)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_get_input(_handler, (IntPtr)_fileGraphID, (IntPtr)inputID, out NativeData inputDesc);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -410,6 +458,9 @@ namespace Adobe.Substance
         /// <returns>True if the target input should be visible in the editor.</returns>
         public bool IsInputVisible(int inputID)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_get_input_visibility(_handler, (IntPtr)_fileGraphID, (IntPtr)inputID, out NativeInputVisibility visibility);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -425,6 +476,9 @@ namespace Adobe.Substance
         /// <param name="value">Input value.</param>
         public void SetInputFloat(int inputID, float value)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             NativeData inputData = new NativeData();
             inputData.DataType = DataType.SBSARIO_DATA_INPUT;
             inputData.ValueType = ValueType.SBSARIO_VALUE_FLOAT;
@@ -448,6 +502,9 @@ namespace Adobe.Substance
         /// <param name="value">Input value.</param>
         public void SetInputFloat2(int inputID, Vector2 value)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             NativeData inputData = new NativeData();
             inputData.DataType = DataType.SBSARIO_DATA_INPUT;
             inputData.ValueType = ValueType.SBSARIO_VALUE_FLOAT2;
@@ -472,6 +529,9 @@ namespace Adobe.Substance
         /// <param name="value">Input value.</param>
         public void SetInputFloat3(int inputID, Vector3 value)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             NativeData inputData = new NativeData();
             inputData.DataType = DataType.SBSARIO_DATA_INPUT;
             inputData.ValueType = ValueType.SBSARIO_VALUE_FLOAT3;
@@ -497,6 +557,9 @@ namespace Adobe.Substance
         /// <param name="value">Input value.</param>
         public void SetInputFloat4(int inputID, Vector4 value)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             NativeData inputData = new NativeData();
             inputData.DataType = DataType.SBSARIO_DATA_INPUT;
             inputData.ValueType = ValueType.SBSARIO_VALUE_FLOAT4;
@@ -523,6 +586,9 @@ namespace Adobe.Substance
         /// <param name="value">Input value.</param>
         public void SetInputInt(int inputID, int value)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             NativeData inputData = new NativeData();
             inputData.DataType = DataType.SBSARIO_DATA_INPUT;
             inputData.ValueType = ValueType.SBSARIO_VALUE_INT;
@@ -546,6 +612,9 @@ namespace Adobe.Substance
         /// <param name="value">Input value.</param>
         public void SetInputInt2(int inputID, Vector2Int value)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             NativeData inputData = new NativeData();
             inputData.DataType = DataType.SBSARIO_DATA_INPUT;
             inputData.ValueType = ValueType.SBSARIO_VALUE_INT2;
@@ -570,6 +639,9 @@ namespace Adobe.Substance
         /// <param name="value">Input value.</param>
         public void SetInputInt3(int inputID, Vector3Int value)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             NativeData inputData = new NativeData();
             inputData.DataType = DataType.SBSARIO_DATA_INPUT;
             inputData.ValueType = ValueType.SBSARIO_VALUE_INT3;
@@ -598,6 +670,9 @@ namespace Adobe.Substance
         /// <param name="w">Input w value.</param>
         public void SetInputInt4(int inputID, int x, int y, int z, int w)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             NativeData inputData = new NativeData();
             inputData.DataType = DataType.SBSARIO_DATA_INPUT;
             inputData.ValueType = ValueType.SBSARIO_VALUE_INT4;
@@ -619,6 +694,9 @@ namespace Adobe.Substance
 
         public void SetInputString(int inputID, string value)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             NativeData inputData = new NativeData();
             inputData.DataType = DataType.SBSARIO_DATA_INPUT;
             inputData.ValueType = ValueType.SBSARIO_VALUE_STRING;
@@ -637,6 +715,9 @@ namespace Adobe.Substance
 
         public void SetInputTexture2DNull(int inputID)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             var imageData = new NativeDataImage
             {
                 channel_order = ChannelOrder.SBSARIO_CHANNEL_ORDER_RGBA,
@@ -668,6 +749,9 @@ namespace Adobe.Substance
 
         public void SetInputTexture2D(int inputID, Texture2D texture)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             if (texture.format == TextureFormat.RGBA64 || texture.format == TextureFormat.R16 || texture.format == TextureFormat.RGB48)
             {
                 var data = texture.GetPixels();
@@ -683,6 +767,9 @@ namespace Adobe.Substance
 
         private void SetInputTexture2D_RGBA64(int inputID, Color[] pixelData, int width, int height)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             if (pixelData == null)
                 return;
 
@@ -736,6 +823,9 @@ namespace Adobe.Substance
 
         private void SetInputTexture2D_RGBA32(int inputID, Color32[] pixelData, int width, int height)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             if (pixelData == null)
                 return;
 
@@ -790,6 +880,9 @@ namespace Adobe.Substance
 
         public float GetInputFloat(int inputID)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_get_input(_handler, (IntPtr)_fileGraphID, (IntPtr)inputID, out NativeData inputDesc);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -803,6 +896,9 @@ namespace Adobe.Substance
 
         public Vector2 GetInputFloat2(int inputID)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_get_input(_handler, (IntPtr)_fileGraphID, (IntPtr)inputID, out NativeData inputDesc);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -816,6 +912,9 @@ namespace Adobe.Substance
 
         public Vector3 GetInputFloat3(int inputID)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_get_input(_handler, (IntPtr)_fileGraphID, (IntPtr)inputID, out NativeData inputDesc);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -829,6 +928,9 @@ namespace Adobe.Substance
 
         public Vector4 GetInputFloat4(int inputID)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_get_input(_handler, (IntPtr)_fileGraphID, (IntPtr)inputID, out NativeData inputDesc);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -842,6 +944,9 @@ namespace Adobe.Substance
 
         public int GetInputInt(int inputID)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_get_input(_handler, (IntPtr)_fileGraphID, (IntPtr)inputID, out NativeData inputDesc);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -855,6 +960,9 @@ namespace Adobe.Substance
 
         public Vector2Int GetInputInt2(int inputID)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_get_input(_handler, (IntPtr)_fileGraphID, (IntPtr)inputID, out NativeData inputDesc);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -868,6 +976,9 @@ namespace Adobe.Substance
 
         public Vector3Int GetInputInt3(int inputID)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_get_input(_handler, (IntPtr)_fileGraphID, (IntPtr)inputID, out NativeData inputDesc);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -881,6 +992,9 @@ namespace Adobe.Substance
 
         public int[] GetInputInt4(int inputID)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_get_input(_handler, (IntPtr)_fileGraphID, (IntPtr)inputID, out NativeData inputDesc);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -894,6 +1008,9 @@ namespace Adobe.Substance
 
         public string GetInputString(int inputID)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_get_input(_handler, (IntPtr)_fileGraphID, (IntPtr)inputID, out NativeData inputDesc);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -909,11 +1026,17 @@ namespace Adobe.Substance
 
         public IntPtr GetNativeHandle()
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             return _handler;
         }
 
         public int GetFileGraphID()
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             return _fileGraphID;
         }
 
@@ -921,6 +1044,9 @@ namespace Adobe.Substance
 
         public void Dispose()
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
@@ -939,6 +1065,11 @@ namespace Adobe.Substance
             }
         }
 
+        public bool IsDisposed()
+        {
+            return _disposedValue;
+        }
+
         ~SubstanceNativeGraph()
         {
             Dispose(disposing: false);
@@ -948,6 +1079,9 @@ namespace Adobe.Substance
 
         private void AssignInputDescription(int inputID, SubstanceInputBase input)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_get_input_desc(_handler, (IntPtr)_fileGraphID, (IntPtr)inputID, out NativeInputDesc inputDesc);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -974,6 +1108,9 @@ namespace Adobe.Substance
 
         private void AssignNumericInputDescription(int inputID, SubstanceInputBase substanceInput)
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_get_numeric_input_desc(_handler, (IntPtr)_fileGraphID, (IntPtr)inputID, out NativeNumericInputDesc inputDesc);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)
@@ -1009,6 +1146,9 @@ namespace Adobe.Substance
 
         public Vector3 GetPhysicalSize()
         {
+            if (_disposedValue)
+                throw new ObjectDisposedException(nameof(SubstanceNativeGraph));
+
             ErrorCode result = (ErrorCode)NativeMethods.sbsario_sbsar_get_physical_size(_handler, (IntPtr)_fileGraphID, out NativePhysicalSize nativePhysicalSize);
 
             if (result != ErrorCode.SBSARIO_ERROR_OK)

@@ -123,6 +123,9 @@ namespace Adobe.Substance
                 case WidgetType.SBSARIO_WIDGET_TOGGLEBUTTON:
                     return SubstanceWidgetType.ToggleButton;
 
+                case WidgetType.SBSARIO_WIDGET_ENUMBUTTONS:
+                    return SubstanceWidgetType.EnumButton;
+
                 case WidgetType.SBSARIO_WIDGET_COMBOBOX:
                     return SubstanceWidgetType.ComboBox;
 

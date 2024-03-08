@@ -1,10 +1,5 @@
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine;
 
 namespace Adobe.Substance
 {
@@ -12,7 +7,7 @@ namespace Adobe.Substance
     {
         private enum LoadState : uint
         {
-            Engine_Unloaded = 0x00u, //!< Engine is currently not loaded
+            Engine_Unloaded = 0x00u, //!< Engine is currently not loaded.
             Engine_Loaded = 0x02u, //!< The engine is loaded
             Engine_FatalError = 0x04u, //!< An unrecoverable error has occurred
         }
@@ -40,11 +35,13 @@ namespace Adobe.Substance
             return Marshal.PtrToStringAnsi(version_ptr);
         }
 
-        //! @brief Initialize the Substance Engine
-        //! @param modulePath Path to the native module, only used if native module
-        //!                   dynamic loading is enabled in the managed library
-        //! @param enginePath Path to the Substance engine on disk, only used if
-        //!                   dynamic engine loading is enabled in the native library
+
+        /// <summary>
+        /// Initialize the Substance Engine by consuming it dynamically.
+        /// </summary>
+        /// <param name="pluginPath">Path to the sbsario library.</param>
+        /// <param name="enginePath">Path to the substance engine library.</param>
+        /// <exception cref="SubstanceException"></exception>
         public static void Initialize(string pluginPath, string enginePath)
         {
             if (sLoadState == LoadState.Engine_Loaded)
@@ -62,6 +59,9 @@ namespace Adobe.Substance
                 throw new SubstanceException(code);
         }
 
+        /// <summary>
+        /// Initialize the Substance Engine by consuming it as a static library. 
+        /// </summary>
         public static void Initialize()
         {
             if (sLoadState == LoadState.Engine_Loaded)
@@ -82,6 +82,9 @@ namespace Adobe.Substance
                 throw new SubstanceException(code);
         }
 
+        /// <summary>
+        /// Shuts down the substance engine.
+        /// </summary>
         public static void Shutdown()
         {
             var code = (ErrorCode)NativeMethods.sbsario_shutdown();
@@ -97,6 +100,12 @@ namespace Adobe.Substance
                 throw new SubstanceException(code);
         }
 
+        /// <summary>
+        /// Load a substance graph into the engine.
+        /// </summary>
+        /// <param name="data">Binary content of the sbsar file.</param>
+        /// <param name="graphID">Id of the graph to be loaded.</param>
+        /// <returns>A SubstanceNativeGraph object.</returns>
         public static SubstanceNativeGraph OpenFile(byte[] data, int graphID)
         {
             if (sLoadState != LoadState.Engine_Loaded)
@@ -107,7 +116,7 @@ namespace Adobe.Substance
         }
 
         /// <summary>
-        /// Get the total graph count for this substance object.
+        /// Get the total graph count for this substance object
         /// </summary>
         /// <returns>Total graph count.</returns>
         public static int GetFileGraphCount(byte[] fileContent)
@@ -116,9 +125,11 @@ namespace Adobe.Substance
             var nativeMemory = Marshal.AllocHGlobal(size);
             Marshal.Copy(fileContent, 0, nativeMemory, size);
 
+            IntPtr handler = default;
+
             try
             {
-                var handler = NativeMethods.sbsario_sbsar_load_from_memory(nativeMemory, (IntPtr)size);
+                handler = NativeMethods.sbsario_sbsar_load_from_memory(nativeMemory, (IntPtr)size);
 
                 if (handler == default)
                     throw new ArgumentException();
@@ -127,22 +138,11 @@ namespace Adobe.Substance
             }
             finally
             {
-                if (nativeMemory != default)
-                    Marshal.FreeHGlobal(nativeMemory);
+                if (handler != default)
+                    NativeMethods.sbsario_sbsar_close(handler);
+
+                Marshal.FreeHGlobal(nativeMemory);
             }
-        }
-
-        private static double InvPow(double pBase, double pResult)
-        {
-            double exposent = Math.Log(pResult) / Math.Log(pBase);
-            return exposent;
-        }
-
-        private static bool IsPowerOfTwo(double number)
-        {
-            double log = Math.Log(number, 2);
-            double pow = Math.Pow(2, Math.Round(log));
-            return pow == number;
         }
     }
 }

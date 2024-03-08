@@ -1,14 +1,11 @@
-//! @file nativemethods.cs
-//! @brief Interface to the sbsario dynamic library for working with Substance
-//! @author Galen Helfter - Adobe
-//! @date 20210608
-//! @copyright Adobe. All rights reserved.
-
 //Do not dynamically load on Android.
 #if (!UNITY_EDITOR && UNITY_ANDROID)
 #define ALG_SBSARIO_STATIC_LOAD
 //Do not dynamically load on IOS.
 #elif (!UNITY_EDITOR && UNITY_IOS)
+#define ALG_SBSARIO_STATIC_LOAD
+
+#elif (UNITY_STANDALONE_LINUX || UNITY_EDITOR_LINUX)
 #define ALG_SBSARIO_STATIC_LOAD
 #else
 //Dynamically load on Mac and Linux and Windows.
@@ -78,14 +75,13 @@ namespace Adobe.Substance
                 }
                 catch (DllNotFoundException e)
                 {
-                    UnityEngine.Debug.Log($"{e.Message}");
                     throw e;
                 }
             }
         }
 
         //! @brief Shut down the sbsario library
-        //! @return Error type enum representing success or error
+        //! @return Error type enum representing success or error.
         internal static uint sbsario_shutdown()
         {
             lock (_locker)

@@ -87,7 +87,7 @@ namespace Adobe.Substance
             if (Application.platform == RuntimePlatform.LinuxEditor
                     || Application.platform == RuntimePlatform.LinuxPlayer)
             {
-                return "libsubstance_ogl3_blend.so";
+                return "libsubstance_ogl3_blend.so.9";
             }
             else if (Application.platform == RuntimePlatform.OSXEditor
                     || Application.platform == RuntimePlatform.OSXPlayer)

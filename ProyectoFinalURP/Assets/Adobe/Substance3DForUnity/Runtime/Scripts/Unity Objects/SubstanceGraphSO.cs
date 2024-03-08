@@ -174,7 +174,7 @@ namespace Adobe.Substance
         /// Initialized the substance graph. Uses the native handle to set all the input parameters, configure output textures, create Unity Texture2D objects for each output and properly assign them to the target material.
         /// This must be called if the substance graph was flagged as Runtime only and will require its assets be generated at runtime.
         /// </summary>
-        /// <param name="handler">Handle to a native substance object.</param>
+        /// <param name="handler">Handle to a native substance object</param>
         public void RuntimeInitialize(SubstanceNativeGraph handler, bool isRuntime = false)
         {
             if (handler.IsInitialized)

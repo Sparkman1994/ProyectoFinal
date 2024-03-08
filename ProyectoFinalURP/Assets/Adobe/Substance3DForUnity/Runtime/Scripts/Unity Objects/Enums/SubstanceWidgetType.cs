@@ -14,6 +14,7 @@ namespace Adobe.Substance
         Angle,
         Color,
         ToggleButton,
+        EnumButton,
         ComboBox,
         Image,
         Position
